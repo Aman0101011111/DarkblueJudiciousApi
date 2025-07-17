@@ -94,36 +94,42 @@ async def add_strike(member, guild):
     strikes[member.id] = strikes.get(member.id, 0) + 1
     strike_count = strikes[member.id]
 
-    # Informal Warning System
+    # Remove old warning roles
+    for i in range(1, 4):
+        warning_role = discord.utils.get(guild.roles, name=f"warning{i}")
+        if warning_role and warning_role in member.roles:
+            await member.remove_roles(warning_role)
+
+    # Give appropriate warning role based on strike count
     if strike_count == 1:
-        informal_warnings[member.id] = informal_warnings.get(member.id, 0) + 1
-        warning_count = informal_warnings[member.id]
-        await member.send(f"⚠️ Informal Warning 1: Please be mindful of your actions in the server. This is your first warning.")
+        warning_role = discord.utils.get(guild.roles, name="warning1")
+        if warning_role:
+            await member.add_roles(warning_role)
+        await member.send(f"⚠️ Warning 1: Please be mindful of your actions in the server. This is your first warning.")
     elif strike_count == 2:
-        informal_warnings[member.id] = informal_warnings.get(member.id, 0) + 1
-        warning_count = informal_warnings[member.id]
-        await member.send(f"⚠️ Informal Warning 2: This is your second warning. Further infractions will result in stricter measures.")
+        warning_role = discord.utils.get(guild.roles, name="warning2")
+        if warning_role:
+            await member.add_roles(warning_role)
+        await member.send(f"⚠️ Warning 2: This is your second warning. Further infractions will result in stricter measures.")
     elif strike_count == 3:
+        warning_role = discord.utils.get(guild.roles, name="warning3")
+        if warning_role:
+            await member.add_roles(warning_role)
+        
         informal_role = discord.utils.get(guild.roles, name="İnformal")
         if informal_role and informal_role in member.roles:
             await member.remove_roles(informal_role)
-            await member.send(f"⚠️ Informal Warning 3: You have received 3 strikes. Your Informal role has been removed for 5 hours.")
-            await asyncio.sleep(5 * 3600)  # Wait 5 hours
-            await member.add_roles(informal_role)
-            await member.send("Your Informal role has been reinstated.")
+            await member.send(f"⚠️ Warning 3: You have received 3 strikes. Your İnformal role has been removed for 5 hours.")
+            
+            # Schedule role restoration after 5 hours
+            async def restore_role():
+                await asyncio.sleep(5 * 3600)  # Wait 5 hours
+                await member.add_roles(informal_role)
+                await member.send("Your İnformal role has been reinstated.")
+            
+            # Run the restoration in the background
+            bot.loop.create_task(restore_role())
         return
-
-    # Remove old strike roles
-    for i in range(1, 4):
-        role = discord.utils.get(guild.roles, name=f"⚠️ {i} Strikes")
-        if role and role in member.roles:
-            await member.remove_roles(role)
-
-    # Add new strike role
-    if strike_count <= 3:
-        role = discord.utils.get(guild.roles, name=f"⚠️ {strike_count} Strikes")
-        if role:
-            await member.add_roles(role)
 
 
 
@@ -237,17 +243,17 @@ async def removestrike(interaction: discord.Interaction, member: discord.Member 
     strikes[member.id] = max(0, strikes[member.id] - amount)
     current_strikes = strikes[member.id]
 
-    # Remove all strike roles
+    # Remove all warning roles
     for i in range(1, 4):
-        role = discord.utils.get(interaction.guild.roles, name=f"⚠️ {i} Strikes")
-        if role and role in member.roles:
-            await member.remove_roles(role)
+        warning_role = discord.utils.get(interaction.guild.roles, name=f"warning{i}")
+        if warning_role and warning_role in member.roles:
+            await member.remove_roles(warning_role)
 
-    # Add new strike role if strikes > 0
+    # Add new warning role if strikes > 0
     if current_strikes > 0:
-        new_role = discord.utils.get(interaction.guild.roles, name=f"⚠️ {current_strikes} Strikes")
-        if new_role:
-            await member.add_roles(new_role)
+        new_warning_role = discord.utils.get(interaction.guild.roles, name=f"warning{current_strikes}")
+        if new_warning_role:
+            await member.add_roles(new_warning_role)
 
     await interaction.response.send_message(f"Removed {amount} strike(s) from {member.mention}. Current strikes: {current_strikes}", ephemeral=True)
 
