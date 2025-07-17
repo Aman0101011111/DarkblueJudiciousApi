@@ -167,6 +167,56 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+@bot.event
+async def on_message_delete(message):
+    # Check if deletion happened in registration channel
+    if message.channel.id == 1378137911987404940:
+        # Check if the deleted message was a '+' from a registered user
+        if message.content == '+' and message.author in registered_users:
+            # Remove user from registered list
+            registered_users.discard(message.author)
+            
+            # If registration was closed and full, reopen it
+            if not signup_active and len(registered_users) < MAX_REGISTRATIONS:
+                await reopen_registration(message.channel)
+            
+            # Update the registration message if signup is still active
+            if signup_active:
+                await update_registration_message(message.channel)
+
+async def reopen_registration(channel):
+    global signup_active
+    signup_active = True
+    
+    # Unlock channel for Informals
+    informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    if informal_role:
+        await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
+    
+    await channel.send("Registration has been reopened due to a participant leaving!", delete_after=10)
+    await update_registration_message(channel)
+
+async def update_registration_message(channel):
+    informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    if not informal_role:
+        return
+    
+    # Create formatted list of participants
+    registered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
+    
+    # Update the registration message
+    ist = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(ist)
+    header = f"Espada: <@&{informal_role.id}>\nEspada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
+    header += "First 10 people to write + are registered for this informal.\nParticipant list is updated every 1 second.\n\n"
+    header += f"Participant Count\n{len(registered_users)}/10\n\nParticipants\n{registered_list}"
+    
+    # Find and edit the first message in the channel
+    async for msg in channel.history(limit=50):
+        if msg.author == bot.user and "Espada:" in msg.content:
+            await msg.edit(content=header)
+            break
+
 
 
 @tree.command()
