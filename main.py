@@ -40,6 +40,11 @@ async def check_time():
 
 async def start_signup(channel):
     global signup_active
+    
+    if channel is None:
+        print("Error: Channel not found. Bot may not be in the server or channel ID is incorrect.")
+        return
+    
     signup_active = True
     registered_users.clear()
 
@@ -58,6 +63,11 @@ async def start_signup(channel):
 
 async def close_signup(channel):
     global signup_active
+    
+    if channel is None:
+        print("Error: Channel not found. Bot may not be in the server or channel ID is incorrect.")
+        return
+    
     if signup_active:
         signup_active = False
         ist = pytz.timezone('Asia/Kolkata')
@@ -234,6 +244,10 @@ async def openreg(interaction: discord.Interaction):
         return
 
     channel = bot.get_channel(1378137911987404940)
+    if channel is None:
+        await interaction.response.send_message("Error: Cannot find the registration channel. Make sure the bot is in the server and has proper permissions.", ephemeral=True)
+        return
+    
     await start_signup(channel)
     await interaction.response.send_message("Registration has been opened manually.", ephemeral=True)
 
@@ -247,6 +261,10 @@ async def closereg(interaction: discord.Interaction):
         return
 
     channel = bot.get_channel(1378137911987404940)
+    if channel is None:
+        await interaction.response.send_message("Error: Cannot find the registration channel. Make sure the bot is in the server and has proper permissions.", ephemeral=True)
+        return
+    
     await close_signup(channel)
     await interaction.response.send_message("Registration has been closed manually.", ephemeral=True)
 
