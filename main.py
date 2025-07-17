@@ -20,6 +20,7 @@ MAX_REGISTRATIONS = 10
 
 # Strike system
 strikes = {}
+informal_warnings = {}  # Track informal warnings
 
 # Define IST timezone globally
 IST = pytz.timezone('Asia/Kolkata')
@@ -93,25 +94,38 @@ async def add_strike(member, guild):
     strikes[member.id] = strikes.get(member.id, 0) + 1
     strike_count = strikes[member.id]
 
+    # Informal Warning System
+    if strike_count == 1:
+        informal_warnings[member.id] = informal_warnings.get(member.id, 0) + 1
+        warning_count = informal_warnings[member.id]
+        await member.send(f"⚠️ Informal Warning 1: Please be mindful of your actions in the server. This is your first warning.")
+    elif strike_count == 2:
+        informal_warnings[member.id] = informal_warnings.get(member.id, 0) + 1
+        warning_count = informal_warnings[member.id]
+        await member.send(f"⚠️ Informal Warning 2: This is your second warning. Further infractions will result in stricter measures.")
+    elif strike_count == 3:
+        informal_role = discord.utils.get(guild.roles, name="İnformal")
+        if informal_role and informal_role in member.roles:
+            await member.remove_roles(informal_role)
+            await member.send(f"⚠️ Informal Warning 3: You have received 3 strikes. Your Informal role has been removed for 5 hours.")
+            await asyncio.sleep(5 * 3600)  # Wait 5 hours
+            await member.add_roles(informal_role)
+            await member.send("Your Informal role has been reinstated.")
+        return
+
     # Remove old strike roles
-    for i in range(1, 6):
+    for i in range(1, 4):
         role = discord.utils.get(guild.roles, name=f"⚠️ {i} Strikes")
         if role and role in member.roles:
             await member.remove_roles(role)
 
     # Add new strike role
-    if strike_count <= 5:
+    if strike_count <= 3:
         role = discord.utils.get(guild.roles, name=f"⚠️ {strike_count} Strikes")
         if role:
             await member.add_roles(role)
 
-    # Handle 5 strikes
-    if strike_count >= 5:
-        informal_role = discord.utils.get(guild.roles, name="İnformal")
-        if informal_role and informal_role in member.roles:
-            await member.remove_roles(informal_role)
-            await asyncio.sleep(5 * 3600)  # Wait 5 hours
-            await member.add_roles(informal_role)
+
 
 @bot.event
 async def on_ready():
@@ -138,7 +152,7 @@ async def on_message(message):
             if message.author != bot.user:
                 strike_channel = bot.get_channel(1395256424715522098)
                 strike_count = strikes.get(message.author.id, 0) + 1
-                strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending message after registration closed\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
+                strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending message after registration closed\nStrike Count: {strike_count}/3\nIssued by: Espada Signup Bot"
                 await strike_channel.send(strike_msg)
                 await add_strike(message.author, message.guild)
             return
@@ -147,7 +161,7 @@ async def on_message(message):
             await message.delete()
             strike_channel = bot.get_channel(1395256424715522098)
             strike_count = strikes.get(message.author.id, 0) + 1
-            strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
+            strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/3\nIssued by: Espada Signup Bot"
             await strike_channel.send(strike_msg)
             await add_strike(message.author, message.guild)
             return
@@ -160,7 +174,7 @@ async def on_message(message):
                 await message.delete()
                 strike_channel = bot.get_channel(1395256424715522098)
                 strike_count = strikes.get(message.author.id, 0) + 1
-                strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Tried to register without Informals role\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
+                strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Tried to register without Informals role\nStrike Count: {strike_count}/3\nIssued by: Espada Signup Bot"
                 await strike_channel.send(strike_msg)
                 await add_strike(message.author, message.guild)
                 return
@@ -203,7 +217,7 @@ async def on_message(message):
             await message.delete()
             strike_channel = bot.get_channel(1395256424715522098)
             strike_count = strikes.get(message.author.id, 0) + 1
-            strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
+            strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/3\nIssued by: Espada Signup Bot"
             await strike_channel.send(strike_msg)
             await add_strike(message.author, message.guild)
 
@@ -224,7 +238,7 @@ async def removestrike(interaction: discord.Interaction, member: discord.Member 
     current_strikes = strikes[member.id]
 
     # Remove all strike roles
-    for i in range(1, 6):
+    for i in range(1, 4):
         role = discord.utils.get(interaction.guild.roles, name=f"⚠️ {i} Strikes")
         if role and role in member.roles:
             await member.remove_roles(role)
