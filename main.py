@@ -31,11 +31,11 @@ async def check_time():
     current_hour = now.hour
     # Check if it's the correct time (every hour at XX:55)
     if now.minute == 55 and not signup_active:
-        channel = bot.get_channel(1367917709828030530)
+        channel = bot.get_channel(1378137911987404940)
         await start_signup(channel)
     # Close registration at XX:10
     elif now.minute == 10 and signup_active:
-        channel = bot.get_channel(1367917709828030530)
+        channel = bot.get_channel(1378137911987404940)
         await close_signup(channel)
 
 async def start_signup(channel):
@@ -119,7 +119,7 @@ async def on_message(message):
         return
 
     # Delete non-plus messages in registration channel
-    if message.channel.id == 1367917709828030530:
+    if message.channel.id == 1378137911987404940:
         if not signup_active:
             await message.delete()
             if message.author != bot.user:
@@ -233,7 +233,7 @@ async def openreg(interaction: discord.Interaction):
         await interaction.response.send_message("Registration is already open!", ephemeral=True)
         return
 
-    channel = bot.get_channel(1367917709828030530)
+    channel = bot.get_channel(1378137911987404940)
     await start_signup(channel)
     await interaction.response.send_message("Registration has been opened manually.", ephemeral=True)
 
@@ -246,7 +246,7 @@ async def closereg(interaction: discord.Interaction):
         await interaction.response.send_message("Registration is already closed!", ephemeral=True)
         return
 
-    channel = bot.get_channel(1367917709828030530)
+    channel = bot.get_channel(1378137911987404940)
     await close_signup(channel)
     await interaction.response.send_message("Registration has been closed manually.", ephemeral=True)
 
