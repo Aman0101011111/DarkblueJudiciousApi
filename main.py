@@ -136,7 +136,7 @@ async def on_message(message):
         if not signup_active:
             await message.delete()
             if message.author != bot.user:
-                strike_channel = bot.get_channel(1369982322505682974)
+                strike_channel = bot.get_channel(1395256424715522098)
                 strike_count = strikes.get(message.author.id, 0) + 1
                 strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending message after registration closed\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
                 await strike_channel.send(strike_msg)
@@ -145,7 +145,7 @@ async def on_message(message):
 
         if message.content != '+' and message.author != bot.user:
             await message.delete()
-            strike_channel = bot.get_channel(1369982322505682974)
+            strike_channel = bot.get_channel(1395256424715522098)
             strike_count = strikes.get(message.author.id, 0) + 1
             strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
             await strike_channel.send(strike_msg)
@@ -158,7 +158,7 @@ async def on_message(message):
             # Check if user has Informals role
             if informal_role not in message.author.roles:
                 await message.delete()
-                strike_channel = bot.get_channel(1369982322505682974)
+                strike_channel = bot.get_channel(1395256424715522098)
                 strike_count = strikes.get(message.author.id, 0) + 1
                 strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Tried to register without Informals role\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
                 await strike_channel.send(strike_msg)
@@ -201,7 +201,7 @@ async def on_message(message):
                 await close_signup(message.channel)
         else:
             await message.delete()
-            strike_channel = bot.get_channel(1369982322505682974)
+            strike_channel = bot.get_channel(1395256424715522098)
             strike_count = strikes.get(message.author.id, 0) + 1
             strike_msg = f"🚨 Strike Issued\nUser: {message.author.mention}\nReason: Sending inappropriate message during registration\nStrike Count: {strike_count}/5\nIssued by: Espada Signup Bot"
             await strike_channel.send(strike_msg)
