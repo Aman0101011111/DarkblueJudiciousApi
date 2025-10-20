@@ -95,6 +95,20 @@ async def close_signup(channel):
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    
+    # Debug: Check if bot can see the channel
+    channel = bot.get_channel(1429128659167477883)
+    if channel:
+        print(f"✓ Bot can access channel: {channel.name} (ID: {channel.id})")
+        print(f"  Server: {channel.guild.name}")
+    else:
+        print("✗ ERROR: Bot cannot find channel 1429128659167477883")
+        print("  Available channels:")
+        for guild in bot.guilds:
+            print(f"  Server: {guild.name}")
+            for ch in guild.text_channels:
+                print(f"    - {ch.name} (ID: {ch.id})")
+    
     check_time.start()
     await tree.sync()
 
