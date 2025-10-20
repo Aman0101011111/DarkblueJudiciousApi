@@ -66,18 +66,20 @@ async def close_signup(channel):
         signup_active = False
         now = datetime.now(IST)
 
+        turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
+        
         numbered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
         
-        header = f"TURFER [5] Registration Closed\n"
+        header = f"{turfer_role.mention if turfer_role else '@TURFER [5]'}\n\n"
+        header += f"TURFER [5] Registration Closed\n"
         header += f"Date: {now.strftime('%Y-%m-%d')}\n"
         header += f"Time: {now.strftime('%H:%M')}\n\n"
         header += "**REGISTRATION CLOSED**\n\n"
-        header += f"Participant Count\n{len(registered_users)}/10\n\n"
-        header += f"Participants\n{numbered_list if numbered_list else 'No participants'}"
+        header += f"Participant Count: {len(registered_users)}/10\n\n"
+        header += f"**Final Registered Members:**\n{numbered_list if numbered_list else 'No participants'}"
         
         await channel.send(header)
 
-        turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
         if turfer_role:
             await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
 
