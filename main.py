@@ -60,17 +60,13 @@ async def start_signup(channel):
     now = datetime.now(ist)
 
     # Build the header message
-    if informal_role:
-        header = f"Espada: <@&{informal_role.id}>\n"
-    else:
-        header = "Espada:\n"
-    
-    header += f"**Espada Informal**\n"
+    header = f"Carnix Inc. Informal\n"
     header += f"Date: {now.strftime('%Y-%m-%d')}\n"
     header += f"Time: {now.strftime('%H:%M')}\n\n"
     header += "First 10 people to write + are registered for this informal.\n"
     header += "Participant list is updated every 1 second.\n\n"
-    header += "**Participant Count**\n0/10\n\n**Participants**\n_No participants yet_"
+    header += "Participant Count\n0/10\n\n"
+    header += "Participants\nNo participants yet"
 
     # Send the header message
     await channel.send(header)
@@ -184,7 +180,7 @@ async def on_message(message):
             # Check if user has Carnix Inc. Informal role
             if informal_role is None or informal_role not in message.author.roles:
                 await message.delete()
-                await message.channel.send(f"{message.author.mention} you need the Carnix Inc. Informal role to register!", delete_after=5)
+                await message.channel.send(f"{message.author.mention} you need TURFER [5] role and Carnix Inc. Informal role to register!", delete_after=5)
                 return
 
             # Check if already registered
@@ -212,13 +208,17 @@ async def on_message(message):
             # Update the registration message
             ist = pytz.timezone('Asia/Kolkata')
             now = datetime.now(ist)
-            header = f"Espada: <@&{informal_role.id}>\nEspada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
-            header += "First 10 people to write + are registered for this informal.\nParticipant list is updated every 1 second.\n\n"
-            header += f"Participant Count\n{len(registered_users)}/10\n\nParticipants\n{registered_list}"
+            header = f"Carnix Inc. Informal\n"
+            header += f"Date: {now.strftime('%Y-%m-%d')}\n"
+            header += f"Time: {now.strftime('%H:%M')}\n\n"
+            header += "First 10 people to write + are registered for this informal.\n"
+            header += "Participant list is updated every 1 second.\n\n"
+            header += f"Participant Count\n{len(registered_users)}/10\n\n"
+            header += f"Participants\n{registered_list}"
 
             # Find and edit the first message in the channel
             async for msg in message.channel.history(limit=50):
-                if msg.author == bot.user and "Espada:" in msg.content:
+                if msg.author == bot.user and "Carnix Inc. Informal" in msg.content:
                     await msg.edit(content=header)
                     break
 
@@ -268,13 +268,17 @@ async def update_registration_message(channel):
     # Update the registration message
     ist = pytz.timezone('Asia/Kolkata')
     now = datetime.now(ist)
-    header = f"Espada: <@&{informal_role.id}>\nEspada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
-    header += "First 10 people to write + are registered for this informal.\nParticipant list is updated every 1 second.\n\n"
-    header += f"Participant Count\n{len(registered_users)}/10\n\nParticipants\n{registered_list}"
+    header = f"Carnix Inc. Informal\n"
+    header += f"Date: {now.strftime('%Y-%m-%d')}\n"
+    header += f"Time: {now.strftime('%H:%M')}\n\n"
+    header += "First 10 people to write + are registered for this informal.\n"
+    header += "Participant list is updated every 1 second.\n\n"
+    header += f"Participant Count\n{len(registered_users)}/10\n\n"
+    header += f"Participants\n{registered_list}"
     
     # Find and edit the first message in the channel
     async for msg in channel.history(limit=50):
-        if msg.author == bot.user and "Espada:" in msg.content:
+        if msg.author == bot.user and "Carnix Inc. Informal" in msg.content:
             await msg.edit(content=header)
             break
 
