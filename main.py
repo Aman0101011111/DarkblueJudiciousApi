@@ -46,10 +46,15 @@ async def start_signup(channel):
     signup_active = True
     registered_users.clear()
 
-    # Unlock channel for Informals - allow sending messages during registration
+    # Get roles
     informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
+    
+    # Set permissions: İnformal can send messages, TURFER cannot
     if informal_role:
         await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
+    if turfer_role:
+        await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
         
     ist = pytz.timezone('Asia/Kolkata')
     now = datetime.now(ist)
@@ -94,8 +99,7 @@ async def close_signup(channel):
         numbered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
         await channel.send(f"{header}{numbered_list}")
 
-        # Lock channel for Informals - view only when registration is closed
-        informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+        # Lock channel for İnformal - view only when registration is closed
         if informal_role:
             await channel.set_permissions(informal_role, send_messages=False, view_channel=True)
 
