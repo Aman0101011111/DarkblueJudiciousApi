@@ -46,15 +46,12 @@ async def start_signup(channel):
     signup_active = True
     registered_users.clear()
 
-    # Get roles
-    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
+    # Get TURFER [5] role
     turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
     
-    # Set permissions: İnformal can send messages, TURFER cannot
-    if informal_role:
-        await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
+    # Set permissions: TURFER [5] can send messages
     if turfer_role:
-        await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
+        await channel.set_permissions(turfer_role, send_messages=True, view_channel=True)
         
     ist = pytz.timezone('Asia/Kolkata')
     now = datetime.now(ist)
@@ -83,21 +80,12 @@ async def close_signup(channel):
         signup_active = False
         ist = pytz.timezone('Asia/Kolkata')
         now = datetime.now(ist)
-        informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
 
-        if informal_role is None:
-            print("Error: İnformal role not found.")
-            return
-
-        header = f"Espada: <@&{informal_role.id}>\nEspada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
+        header = f"Carnix Inc. Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
         header += "**REGISTRATION CLOSED**\n\n"
         header += f"Participant Count\n{len(registered_users)}/10\n\nParticipants\n"
         numbered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
         await channel.send(f"{header}{numbered_list}")
-
-        # Lock channel for İnformal - view only when registration is closed
-        if informal_role:
-            await channel.set_permissions(informal_role, send_messages=False, view_channel=True)
 
         # Tag TURFER [5] role and open channel for 15 minutes
         turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
@@ -175,12 +163,12 @@ async def on_message(message):
             return
 
         if signup_active and message.content.strip() == '+':
-            informal_role = discord.utils.get(message.guild.roles, name="Carnix Inc. Informal")
+            turfer_role = discord.utils.get(message.guild.roles, name="TURFER [5]")
 
-            # Check if user has Carnix Inc. Informal role
-            if informal_role is None or informal_role not in message.author.roles:
+            # Check if user has TURFER [5] role
+            if turfer_role is None or turfer_role not in message.author.roles:
                 await message.delete()
-                await message.channel.send(f"{message.author.mention} you need TURFER [5] role and Carnix Inc. Informal role to register!", delete_after=5)
+                await message.channel.send(f"{message.author.mention} you need TURFER [5] role to register!", delete_after=5)
                 return
 
             # Check if already registered
@@ -249,19 +237,15 @@ async def reopen_registration(channel):
     global signup_active
     signup_active = True
     
-    # Unlock channel for Carnix Inc. Informal
-    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
-    if informal_role:
-        await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
+    # Unlock channel for TURFER [5]
+    turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
+    if turfer_role:
+        await channel.set_permissions(turfer_role, send_messages=True, view_channel=True)
     
     await channel.send("Registration has been reopened due to a participant leaving!", delete_after=10)
     await update_registration_message(channel)
 
 async def update_registration_message(channel):
-    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
-    if not informal_role:
-        return
-    
     # Create formatted list of participants
     registered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
     
