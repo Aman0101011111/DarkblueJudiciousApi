@@ -95,16 +95,23 @@ async def close_signup(channel):
             
             # Send message tagging TURFER [5] with participant list
             turfer_message = f"{turfer_role.mention}\n\n"
-            turfer_message += f"Espada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
+            turfer_message += f"**Espada Informal**\n"
+            turfer_message += f"Date: {now.strftime('%Y-%m-%d')}\n"
+            turfer_message += f"Time: {now.strftime('%H:%M')}\n\n"
             turfer_message += f"Registration is now closed. Channel is open for 15 minutes.\n\n"
-            turfer_message += f"Participant Count: {len(registered_users)}/10\n\nParticipants:\n{numbered_list}"
+            turfer_message += f"**Participant Count: {len(registered_users)}/10**\n\n"
+            turfer_message += f"**Participants:**\n{numbered_list}"
             
             await channel.send(turfer_message)
             
-            # Schedule channel closure for TURFER [5] after 15 minutes
-            await asyncio.sleep(900)  # 900 seconds = 15 minutes
-            await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
-            await channel.send(f"Channel closed for {turfer_role.mention}. See you next time!", delete_after=10)
+            # Schedule channel closure for TURFER [5] after 15 minutes using a background task
+            async def close_turfer_access():
+                await asyncio.sleep(900)  # 900 seconds = 15 minutes
+                await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
+                await channel.send(f"Channel closed for {turfer_role.mention}. See you next time!", delete_after=10)
+            
+            # Run the closure task in the background
+            bot.loop.create_task(close_turfer_access())
 
 
 
