@@ -86,7 +86,25 @@ async def close_signup(channel):
         informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
         if informal_role:
             await channel.set_permissions(informal_role, send_messages=False, view_channel=True)
-            await channel.send(f"Registration closed. {informal_role.mention} members can now only view messages.", delete_after=10)
+
+        # Tag TURFER [5] role and open channel for 15 minutes
+        turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
+        if turfer_role:
+            # Open channel for TURFER [5] role
+            await channel.set_permissions(turfer_role, send_messages=True, view_channel=True)
+            
+            # Send message tagging TURFER [5] with participant list
+            turfer_message = f"{turfer_role.mention}\n\n"
+            turfer_message += f"Espada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
+            turfer_message += f"Registration is now closed. Channel is open for 15 minutes.\n\n"
+            turfer_message += f"Participant Count: {len(registered_users)}/10\n\nParticipants:\n{numbered_list}"
+            
+            await channel.send(turfer_message)
+            
+            # Schedule channel closure for TURFER [5] after 15 minutes
+            await asyncio.sleep(900)  # 900 seconds = 15 minutes
+            await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
+            await channel.send(f"Channel closed for {turfer_role.mention}. See you next time!", delete_after=10)
 
 
 
