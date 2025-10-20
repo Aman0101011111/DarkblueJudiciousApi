@@ -29,11 +29,11 @@ async def check_time():
     current_hour = now.hour
     # Check if it's the correct time (every hour at XX:55)
     if now.minute == 55 and not signup_active:
-        channel = bot.get_channel(1378137911987404940)
+        channel = bot.get_channel(1429128659167477883)
         await start_signup(channel)
     # Close registration at XX:10
     elif now.minute == 10 and signup_active:
-        channel = bot.get_channel(1378137911987404940)
+        channel = bot.get_channel(1429128659167477883)
         await close_signup(channel)
 
 async def start_signup(channel):
@@ -111,7 +111,7 @@ async def on_message(message):
         return
 
     # Delete non-plus messages in registration channel
-    if message.channel.id == 1378137911987404940:
+    if message.channel.id == 1429128659167477883:
         if not signup_active:
             await message.delete()
             return
@@ -170,7 +170,7 @@ async def on_message(message):
 @bot.event
 async def on_message_delete(message):
     # Check if deletion happened in registration channel
-    if message.channel.id == 1378137911987404940:
+    if message.channel.id == 1429128659167477883:
         # Check if the deleted message was a '+' from a registered user
         if message.content == '+' and message.author in registered_users:
             # Remove user from registered list
@@ -228,7 +228,7 @@ async def openreg(interaction: discord.Interaction):
         await interaction.response.send_message("Registration is already open!", ephemeral=True)
         return
 
-    channel = bot.get_channel(1378137911987404940)
+    channel = bot.get_channel(1429128659167477883)
     if channel is None:
         await interaction.response.send_message("Error: Cannot find the registration channel. Make sure the bot is in the server and has proper permissions.", ephemeral=True)
         return
@@ -245,7 +245,7 @@ async def closereg(interaction: discord.Interaction):
         await interaction.response.send_message("Registration is already closed!", ephemeral=True)
         return
 
-    channel = bot.get_channel(1378137911987404940)
+    channel = bot.get_channel(1429128659167477883)
     if channel is None:
         await interaction.response.send_message("Error: Cannot find the registration channel. Make sure the bot is in the server and has proper permissions.", ephemeral=True)
         return
