@@ -50,14 +50,26 @@ async def start_signup(channel):
     informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
     if informal_role:
         await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
-        ist = pytz.timezone('Asia/Kolkata')
-        now = datetime.now(ist)
+        
+    ist = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(ist)
 
-        header = f"Espada: <@&{informal_role.id}>\nEspada Informal\nDate: {now.strftime('%Y-%m-%d')}\nTime: {now.strftime('%H:%M')}\n\n"
-        header += "First 10 people to write + are registered for this informal.\nParticipant list is updated every 1 second.\n\n"
-        header += "Participant Count\n0/10\n\nParticipants"
+    # Build the header message
+    if informal_role:
+        header = f"Espada: <@&{informal_role.id}>\n"
+    else:
+        header = "Espada:\n"
+    
+    header += f"**Espada Informal**\n"
+    header += f"Date: {now.strftime('%Y-%m-%d')}\n"
+    header += f"Time: {now.strftime('%H:%M')}\n\n"
+    header += "First 10 people to write + are registered for this informal.\n"
+    header += "Participant list is updated every 1 second.\n\n"
+    header += "**Participant Count**\n0/10\n\n**Participants**\n_No participants yet_"
 
-        await channel.send(header)
+    # Send the header message
+    await channel.send(header)
+    print(f"✓ Registration opened at {now.strftime('%H:%M')}")
 
 async def close_signup(channel):
     global signup_active
@@ -146,16 +158,19 @@ async def on_command_error(ctx, error):
 
 @bot.event
 async def on_message(message):
+    # Don't process bot's own messages
     if message.author == bot.user:
         return
 
     # Delete non-plus messages in registration channel
     if message.channel.id == 1429128659167477883:
+        # If registration is not active, delete all user messages
         if not signup_active:
             await message.delete()
             return
 
-        if message.content != '+' and message.author != bot.user:
+        # During registration, only allow '+' messages
+        if message.content.strip() != '+':
             await message.delete()
             return
 
