@@ -182,8 +182,9 @@ async def on_message(message):
             informal_role = discord.utils.get(message.guild.roles, name="Carnix Inc. Informal")
 
             # Check if user has Carnix Inc. Informal role
-            if informal_role not in message.author.roles:
+            if informal_role is None or informal_role not in message.author.roles:
                 await message.delete()
+                await message.channel.send(f"{message.author.mention} you need the Carnix Inc. Informal role to register!", delete_after=5)
                 return
 
             # Check if already registered
@@ -200,6 +201,10 @@ async def on_message(message):
 
             # Add user to registered list
             registered_users.add(message.author)
+            
+            # Don't delete the + message immediately - let it stay briefly
+            await asyncio.sleep(0.5)
+            await message.delete()
 
             # Create formatted list of participants
             registered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
@@ -220,8 +225,6 @@ async def on_message(message):
             # Close registration if full
             if len(registered_users) >= MAX_REGISTRATIONS:
                 await close_signup(message.channel)
-        else:
-            await message.delete()
 
     await bot.process_commands(message)
 
