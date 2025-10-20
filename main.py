@@ -45,7 +45,8 @@ async def start_signup(channel):
         
     now = datetime.now(IST)
 
-    header = f"TURFER [5] Registration\n"
+    header = f"{turfer_role.mention if turfer_role else '@TURFER [5]'}\n\n"
+    header += f"**TURFER [5] REGISTRATION OPEN**\n\n"
     header += f"Date: {now.strftime('%Y-%m-%d')}\n"
     header += f"Time: {now.strftime('%H:%M')}\n\n"
     header += "First 10 people to write + are registered for this informal.\n"
@@ -70,15 +71,16 @@ async def close_signup(channel):
         
         numbered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
         
-        header = f"{turfer_role.mention if turfer_role else '@TURFER [5]'}\n\n"
-        header += f"TURFER [5] Registration Closed\n"
-        header += f"Date: {now.strftime('%Y-%m-%d')}\n"
-        header += f"Time: {now.strftime('%H:%M')}\n\n"
-        header += "**REGISTRATION CLOSED**\n\n"
-        header += f"Participant Count: {len(registered_users)}/10\n\n"
-        header += f"**Final Registered Members:**\n{numbered_list if numbered_list else 'No participants'}"
+        message = f"{turfer_role.mention if turfer_role else '@TURFER [5]'}\n\n"
+        message += f"**TURFER [5] REGISTRATION CLOSED**\n\n"
+        message += f"Date: {now.strftime('%Y-%m-%d')}\n"
+        message += f"Time: {now.strftime('%H:%M')}\n\n"
+        message += f"Participant Count: {len(registered_users)}/10\n\n"
+        message += f"**Final Registered Members:**\n"
+        message += f"{numbered_list if numbered_list else 'No participants'}"
         
-        await channel.send(header)
+        await channel.send(message)
+        print(f"✓ Registration closed at {now.strftime('%H:%M')} with {len(registered_users)} participants")
 
         if turfer_role:
             await channel.set_permissions(turfer_role, send_messages=False, view_channel=True)
@@ -136,15 +138,17 @@ async def on_message(message):
             registered_list = '\n'.join([f"{idx+1}. {user.mention}" for idx, user in enumerate(registered_users)])
 
             now = datetime.now(IST)
-            header = f"TURFER [5] Registration\n"
+            header = f"{turfer_role.mention if turfer_role else '@TURFER [5]'}\n\n"
+            header += f"**TURFER [5] REGISTRATION OPEN**\n\n"
             header += f"Date: {now.strftime('%Y-%m-%d')}\n"
             header += f"Time: {now.strftime('%H:%M')}\n\n"
             header += "First 10 people to write + are registered for this informal.\n"
+            header += "Participant list is updated every 1 second.\n\n"
             header += f"Participant Count\n{len(registered_users)}/10\n\n"
             header += f"Participants\n{registered_list}"
 
             async for msg in message.channel.history(limit=50):
-                if msg.author == bot.user and "TURFER [5] Registration" in msg.content:
+                if msg.author == bot.user and "TURFER [5] REGISTRATION" in msg.content:
                     await msg.edit(content=header)
                     break
 
