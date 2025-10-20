@@ -47,7 +47,7 @@ async def start_signup(channel):
     registered_users.clear()
 
     # Get roles
-    informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
     turfer_role = discord.utils.get(channel.guild.roles, name="TURFER [5]")
     
     # Set permissions: İnformal can send messages, TURFER cannot
@@ -87,7 +87,7 @@ async def close_signup(channel):
         signup_active = False
         ist = pytz.timezone('Asia/Kolkata')
         now = datetime.now(ist)
-        informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+        informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
 
         if informal_role is None:
             print("Error: İnformal role not found.")
@@ -179,9 +179,9 @@ async def on_message(message):
             return
 
         if signup_active and message.content.strip() == '+':
-            informal_role = discord.utils.get(message.guild.roles, name="İnformal")
+            informal_role = discord.utils.get(message.guild.roles, name="Carnix Inc. Informal")
 
-            # Check if user has Informals role
+            # Check if user has Carnix Inc. Informal role
             if informal_role not in message.author.roles:
                 await message.delete()
                 return
@@ -246,8 +246,8 @@ async def reopen_registration(channel):
     global signup_active
     signup_active = True
     
-    # Unlock channel for Informals
-    informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    # Unlock channel for Carnix Inc. Informal
+    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
     if informal_role:
         await channel.set_permissions(informal_role, send_messages=True, view_channel=True)
     
@@ -255,7 +255,7 @@ async def reopen_registration(channel):
     await update_registration_message(channel)
 
 async def update_registration_message(channel):
-    informal_role = discord.utils.get(channel.guild.roles, name="İnformal")
+    informal_role = discord.utils.get(channel.guild.roles, name="Carnix Inc. Informal")
     if not informal_role:
         return
     
